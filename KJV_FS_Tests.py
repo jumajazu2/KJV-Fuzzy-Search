@@ -24,20 +24,43 @@ for book in range(books):
 print(books)
 """
 
-def book_chapters(book_no):
+def book_chapters(book_no):  #function to return chapter count for a specific book
     book_index = book_no - 1
     number_chapters = len(data["books"][book_index]["chapters"])
-    #number_verses = len(data["books"][book_index]["chapters"][number_chapters-1]["verses"])
     return number_chapters
 
-def chapter_verses(book_no, chapter_no):
+def chapter_verses(book_no, chapter_no): #function to return verse count for a specific chapter in a book
     book_index = book_no - 1
     chapter_index = chapter_no - 1
     number_verses = len(data["books"][book_index]["chapters"][chapter_index]["verses"])
     return number_verses
 
-print(book_chapters(5))
-print(chapter_verses(5, 8))
+
+def get_verse (book_no, chapter_no, verse_no):  #return a specific verse
+    book_index = book_no - 1
+    chapter_index = chapter_no - 1
+    verse_index = verse_no -1
+
+    verse = (data["books"][book_index]["chapters"][chapter_index]["verses"][verse_index]["text"])
+
+    return verse
+
+
+bible_books = 66 #constant for number of books
+
+
+#the following code is to cycle through all books, chapters and verse
+
+for index_book in range(1, bible_books+1):
+    for index_chapter in range(book_chapters(index_book)+1):
+        for index_verse in range(chapter_verses(index_book, index_chapter)+1):
+            print(get_verse(index_book, index_chapter, index_verse))
+            
+
+
+
+
+
 
 """
 
