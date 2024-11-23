@@ -1,28 +1,12 @@
 import json
 
-from fuzzysearch import find_near_matches 
+#from fuzzysearch import find_near_matches 
 #some faster libraries here: https://medium.com/codex/best-libraries-for-fuzzy-matching-in-python-cbb3e0ef87dd
 
 # Load the JSON file
 with open('C:/Users/Juraj/Documents/IT/Python/KJV_fuzzy_search/kjv.json', 'r') as file:
     data = json.load(file)
-"""
-print(type(data))
 
-print(data["language"])
-
-print(len(data["books"][1]["name"]))
-
-print(range(len(data["books"][65]["chapters"][0]["verses"][1]["text"])))
-
-books = len(data["books"]) #find the number of books
-for book in range(books):
-    print((data["books"][book]["name"]))
-
-    chapters = len(data["books"][book]["name"]) #this should give the number of chapters in each book, but it gives the character count of the book name
-    print(chapters)
-print(books)
-"""
 
 def book_chapters(book_no):  #function to return chapter count for a specific book
     book_index = book_no - 1
@@ -49,28 +33,68 @@ def clean_list (query_string):
     query_string = query_string.upper() #make whole string uppercase
     mydict = {46: None, 44: None, 59: None, 63: None, 34: None, 45: None} # remove . , ; ? " -
     query_string = query_string.translate(mydict) #remove punctuation from whole string
+     
     query_list = query_string.split()
+    try:                #remove articles from string
+        query_list.remove("THE")
+    except ValueError:
+        pass
+
+    try:
+        query_list.remove("A")
+    except ValueError:
+        pass
+
     return query_list
 
 def compare (query_string, base_string):
     query_string = clean_list(query_string) #turn query string into a list containing its uppercase words, stripped of any punctuation
+    #print(query_string)
     base_string = clean_list(base_string) #turn base KJV string into a list containing its uppercase words, stripped of any punctuation
+    #print(base_string)
     total_found = 0
-    for number_words in range(len(query_string)+1):
+    for number_words in range(len(query_string)):
         count_found = base_string.count(query_string[number_words])
         if count_found > 0:
             total_found = total_found + 1
-    
-    
+    final_ratio = total_found/len(query_string)
+
+    return(final_ratio)
+
+def scan_all (query_input):
+    bible_books = 66 #constant for number of books
+    results_verses = [] #create empty list
+    for index_book in range(1, bible_books+1):
+        for index_chapter in range(book_chapters(index_book)+1):
+            for index_verse in range(chapter_verses(index_book, index_chapter)+1):
+                base_verse = (get_verse(index_book, index_chapter, index_verse))
+                score = compare(query_input, base_verse)
+                if score > 0.75:
+                    results_verses.append(base_verse)
+                    results_verses.append(str(score))
+    return results_verses
+
+
+import pyperclip              
+while True:
+    query_input = input("String to find: ")
+    if query_input == "exit":
+        break
+    results_verses = scan_all(query_input)
+    if len(results_verses) == 0:
+        print("No match found.")
+    else:
+        print(results_verses)
+        pyperclip.copy(results_verses[0])
+
+
+
+# results could also include context, 5 verses before and after
 
 
 
 
 
-
-
-
-bible_books = 66 #constant for number of books
 
 
 
@@ -94,7 +118,7 @@ for index_book in range(1, bible_books+1):
 
 
 
-"""
+
 def fuzzy_search(query_string):
     query_words = query_string.split()
     query_words = query_string.upper()
@@ -104,7 +128,6 @@ def fuzzy_search(query_string):
 
 
 
-"""
 
 
 
