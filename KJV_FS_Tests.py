@@ -1,4 +1,5 @@
 import json
+import asyncio
 
 #from fuzzysearch import find_near_matches 
 #some faster libraries here: https://medium.com/codex/best-libraries-for-fuzzy-matching-in-python-cbb3e0ef87dd
@@ -75,7 +76,47 @@ def scan_all (query_input):
     return results_verses
 
 
-import pyperclip              
+import pyperclip   
+
+launch_code = "#KJVFS#"
+
+async def check_clipboard():
+    while True:
+# Get the current clipboard content
+        clipboard_content = pyperclip.paste()
+
+# Check if the specific text is in the clipboard
+        if launch_code in clipboard_content:
+            print("Launch code detected in clipboard!")
+            print(clipboard_content)
+            await execute_code(clipboard_content)
+            
+
+# Wait for a short period before checking again
+        await asyncio.sleep(1)
+
+async def execute_code(clipboard_content):
+# Your code to execute when the specific text is found
+    clipboard_content_cleared = clipboard_content.translate(str.maketrans('', '', '#KJVFS#')) 
+    print(clipboard_content_cleared)
+    pyperclip.copy('')
+    results_verses = scan_all(clipboard_content_cleared)
+    if len(results_verses) == 0:
+        print("No match found.")
+    else:
+        print(results_verses)
+        pyperclip.copy(results_verses[0])
+
+
+# Start monitoring the clipboard
+print("Monitoring clipboard for launch code...")
+asyncio.run(check_clipboard())
+
+
+
+
+"""
+
 while True:
     query_input = input("String to find: ")
     if query_input == "exit":
@@ -87,11 +128,11 @@ while True:
         print(results_verses)
         pyperclip.copy(results_verses[0])
 
-
+"""
 
 # results could also include context, 5 verses before and after
 
-
+# sorting results by score
 
 
 
