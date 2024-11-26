@@ -1,5 +1,7 @@
 import json
 import asyncio
+from rich import print
+from rich.console import Console
 
 #from fuzzysearch import find_near_matches 
 #some faster libraries here: https://medium.com/codex/best-libraries-for-fuzzy-matching-in-python-cbb3e0ef87dd
@@ -32,7 +34,7 @@ def get_verse (book_no, chapter_no, verse_no):  #return a specific verse
 
 def clean_list (query_string):
     query_string = query_string.upper() #make whole string uppercase
-    mydict = {46: None, 44: None, 59: None, 63: None, 34: None, 45: None} # remove . , ; ? " -
+    mydict = {46: None, 44: None, 59: None, 63: None, 34: None, 45: None, 33: None, 34: None, 62: None, 60: None, 47: None} # remove . , ; ? " -
     query_string = query_string.translate(mydict) #remove punctuation from whole string
      
     query_list = query_string.split()
@@ -95,7 +97,9 @@ async def check_clipboard():
 
 # Check if the specific text is in the clipboard
         if launch_code in clipboard_content:
-            print("Launch code detected in clipboard!")
+            #print("Launch code detected in clipboard!")
+            console = Console()
+            console.clear()
             print(clipboard_content)
             await execute_code(clipboard_content)
             
@@ -108,15 +112,22 @@ async def execute_code(clipboard_content):
     clipboard_content_cleared = clipboard_content #.translate(str.maketrans('', '', '#KJVFS#')) 
     print(clipboard_content_cleared)
     pyperclip.copy('')
+    
     results_verses = scan_all(clipboard_content_cleared)
     if len(results_verses) == 0:
+        console = Console()
+        console.clear()
         print("No match found.")
     else:
-        print(results_verses)
+        for item in range(int(len(results_verses)/2+1)):
+            print(results_verses[item])
+            print("\n")
         pyperclip.copy(results_verses[0])
 
 
 # Start monitoring the clipboard
+console = Console()
+console.clear()
 print("Monitoring clipboard for launch code...")
 asyncio.run(check_clipboard())
 
@@ -129,3 +140,7 @@ asyncio.run(check_clipboard())
 # sorting results by score
 
 # automatic look when a segment is selected
+
+# indicate differences, show context in dart
+
+# another button to send the whole segment to search
