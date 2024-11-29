@@ -6,6 +6,8 @@ from rich.console import Console
 #from fuzzysearch import find_near_matches 
 #some faster libraries here: https://medium.com/codex/best-libraries-for-fuzzy-matching-in-python-cbb3e0ef87dd
 
+# terminal display fromatting https://rich.readthedocs.io/en/stable/index.html
+
 # Load the JSON file
 with open('C:/Users/Juraj/Documents/IT/Python/KJV_fuzzy_search/kjv.json', 'r') as file:
     data = json.load(file)
@@ -98,8 +100,9 @@ async def check_clipboard():
 # Check if the specific text is in the clipboard
         if launch_code in clipboard_content:
             #print("Launch code detected in clipboard!")
-            console = Console()
-            console.clear()
+            
+            #console = Console()
+            #console.clear()
             print(clipboard_content)
             await execute_code(clipboard_content)
             
@@ -115,8 +118,8 @@ async def execute_code(clipboard_content):
     
     results_verses = scan_all(clipboard_content_cleared)
     if len(results_verses) == 0:
-        console = Console()
-        console.clear()
+        #console = Console()
+        #console.clear()
         print("No match found.")
     else:
         for item in range(int(len(results_verses)/2+1)):
@@ -126,8 +129,9 @@ async def execute_code(clipboard_content):
 
 
 # Start monitoring the clipboard
-console = Console()
-console.clear()
+
+#console = Console()
+#console.clear()
 print("Monitoring clipboard for launch code...")
 asyncio.run(check_clipboard())
 
