@@ -34,6 +34,15 @@ def get_verse (book_no, chapter_no, verse_no):  #return a specific verse
 
     return verse
 
+def get_reference (book_no, chapter_no, verse_no):  #return a specific verse
+    book_index = book_no - 1
+    chapter_index = chapter_no - 1
+    verse_index = verse_no -1
+
+    reference = (data["books"][book_index]["chapters"][chapter_index]["verses"][verse_index]["name"])
+
+    return reference
+
 def clean_list (query_string):
     query_string = query_string.upper() #make whole string uppercase
     mydict = {46: None, 44: None, 59: None, 63: None, 34: None, 45: None, 33: None, 34: None, 62: None, 60: None, 47: None} # remove . , ; ? " -
@@ -77,14 +86,22 @@ def compare (query_string, base_string):
 def scan_all (query_input):
     bible_books = 66 #constant for number of books
     results_verses = [] #create empty list
+    number_results = 0
     for index_book in range(1, bible_books+1):
         for index_chapter in range(book_chapters(index_book)+1):
             for index_verse in range(chapter_verses(index_book, index_chapter)+1):
                 base_verse = (get_verse(index_book, index_chapter, index_verse))
                 score = compare(query_input, base_verse)
                 if score > 0.75:
+                    ref = get_reference(index_book, index_chapter, index_verse)
+                    results_verses.append(ref)
                     results_verses.append(base_verse)
                     results_verses.append(str(score))
+                    results_verses.append("----------------------------------------------------------------")
+                    number_results = number_results + 1
+    print("Number of hits:")
+    print(number_results)
+    print("\n")
     return results_verses
 
 
@@ -92,18 +109,22 @@ import pyperclip
 
 launch_code = "#KJVFS#"
 
+original_content = ""
+
 async def check_clipboard():
     while True:
 # Get the current clipboard content
         clipboard_content = pyperclip.paste()
 
 # Check if the specific text is in the clipboard
-        if launch_code in clipboard_content:
+        global original_content
+        if clipboard_content != original_content:
             #print("Launch code detected in clipboard!")
             
             #console = Console()
             #console.clear()
-            print(clipboard_content)
+            #print(clipboard_content)
+            original_content = clipboard_content
             await execute_code(clipboard_content)
             
 
@@ -113,8 +134,8 @@ async def check_clipboard():
 async def execute_code(clipboard_content):
 # Your code to execute when the specific text is found
     clipboard_content_cleared = clipboard_content #.translate(str.maketrans('', '', '#KJVFS#')) 
-    print(clipboard_content_cleared)
-    pyperclip.copy('')
+    #print(clipboard_content_cleared)
+    #pyperclip.copy('')
     
     results_verses = scan_all(clipboard_content_cleared)
     if len(results_verses) == 0:
@@ -122,17 +143,18 @@ async def execute_code(clipboard_content):
         #console.clear()
         print("No match found.")
     else:
-        for item in range(int(len(results_verses)/2+1)):
+        for item in range(int(len(results_verses))):
+            #print(item)
             print(results_verses[item])
-            print("\n")
-        pyperclip.copy(results_verses[0])
+            #print("\n")
+        #pyperclip.copy(results_verses[0])
 
 
 # Start monitoring the clipboard
 
 #console = Console()
 #console.clear()
-print("Monitoring clipboard for launch code...")
+print("Monitoring clipboard...")
 asyncio.run(check_clipboard())
 
 
